@@ -23,6 +23,11 @@ builds:
       - arm64
       - amd64
       - "386"
+      - arm
+    goarm:
+      - "5"
+      - "6"
+      - "7"
     ignore:
       - goos: darwin
         goarch: "386"
@@ -59,6 +64,29 @@ changelog:
       - Merge pull request
       - Merge branch
 
+dockers_v2:
+  - id: spmonitor-ttyd
+    ids:
+      - spmonitor
+    dockerfile: Dockerfile.ttyd
+    images:
+      - "ghcr.io/thin-edge/spmonitor-ttyd"
+    tags:
+      - "{{ .Tag }}"
+      - "v{{ .Major }}"
+      - "{{ if not .IsNightly }}latest{{ end }}"
+    platforms:
+      - linux/amd64
+      - linux/arm64
+      - linux/arm/v7
+      - linux/arm/v6
+    labels:
+      "org.opencontainers.image.description": "Sparkplug B CNC device simulator with ttyd web terminal"
+      "org.opencontainers.image.created": "{{.Date}}"
+      "org.opencontainers.image.revision": "{{.FullCommit}}"
+      "org.opencontainers.image.version": "{{.Version}}"
+      "org.opencontainers.image.source": "{{.GitURL}}"
+
 release:
   draft: false
   prerelease: auto
@@ -71,7 +99,7 @@ nfpms:
       - spmonitor
     release: "1"
     maintainer: thin-edge.io <info@thin-edge.io>
-    file_name_template: "{{ .ConventionalFileName }}"
+    file_name_template: "{{ .PackageName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}"
     formats:
       - deb
       - apk
