@@ -1,0 +1,6 @@
+FROM alpine:3
+RUN apk add --no-cache ttyd
+ARG TARGETPLATFORM
+COPY ${TARGETPLATFORM}/spmonitor /usr/local/bin/spmonitor
+EXPOSE 7681
+CMD ["ttyd", "-W", "-p", "7681", "/usr/local/bin/spmonitor"]
