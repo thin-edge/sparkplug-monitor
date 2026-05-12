@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+version: 2
+project_name: spmonitor
+dist: dist/
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: spmonitor
+    main: ./cmd/spmonitor
+    binary: spmonitor
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - arm64
+      - amd64
+      - "386"
+    ignore:
+      - goos: darwin
+        goarch: "386"
+      - goos: windows
+        goarch: arm64
+
+archives:
+  - ids:
+      - spmonitor
+    formats: [tar.gz]
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - README.md
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - Merge pull request
+      - Merge branch
+
+release:
+  draft: false
+  prerelease: auto
+
+nfpms:
+  # ── Binary-only package ────────────────────────────────────────────────────
+  # Installs /usr/bin/spmonitor
+  - id: spmonitor
+    ids:
+      - spmonitor
+    release: "1"
+    maintainer: thin-edge.io <info@thin-edge.io>
+    file_name_template: "{{ .ConventionalFileName }}"
+    formats:
+      - deb
+      - apk
+      - rpm
+    package_name: spmonitor
+    description: Sparkplug B monitor/client

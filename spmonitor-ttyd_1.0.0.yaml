@@ -1,0 +1,20 @@
+services:
+  spmonitor-ttyd:
+    image: tsl0922/ttyd
+    restart: unless-stopped
+    # Still using host mode to make the web UI accessible on the host IP
+    network_mode: "host"
+    
+    # Run as a non-root user (UID 1000 is standard for the first host user)
+    user: "1000:1000"
+    
+    # We strip all kernel capabilities for maximum hardening
+    cap_drop:
+      - ALL
+
+    volumes:
+      # Mount the folder instead of the file
+      - /usr/bin:/host_bin:ro
+      
+    # Execute the binary directly via ttyd
+    command: ["ttyd", "-W", "-p", "7682", "/host_bin/spmonitor"]

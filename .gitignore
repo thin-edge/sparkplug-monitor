@@ -1,0 +1,14 @@
+# dotenv environment variable files
+.env
+.env.*
+!.env.example
+
+# macOS
+.DS_Store
+
+# Added by goreleaser init:
+dist/
+/spmonitor
+
+# misc.
+wordlist.txt
